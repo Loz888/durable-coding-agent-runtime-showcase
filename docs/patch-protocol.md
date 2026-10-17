@@ -2,7 +2,7 @@
 
 [English](patch-protocol.md) | [简体中文](zh-CN/patch-protocol.md) | [Home](../README.md)
 
-This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+This page describes the implementation. Run reproduction commands in the [public source repository](https://github.com/Loz888/durable-coding-agent-runtime-source); this documentation repository contains no source and does not execute software CI.
 
 ```text
 prepared → applied → verified_pass / verified_fail

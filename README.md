@@ -35,7 +35,7 @@ The following capabilities describe the published implementation:
 - Deterministic Mock proposals for controlled single-file Go repairs.
 - Real PostgreSQL, concurrent-owner and owned-child SIGKILL tests.
 
-No throughput or latency benchmark is claimed.
+Day 21 adds a small recorded Mock evaluation; no general throughput or latency benchmark is claimed.
 
 ## Architecture
 
@@ -65,6 +65,7 @@ flowchart TD
 | [Execution lifecycle](docs/execution-lifecycle.md) | Claim, heartbeat, checkpoint and retry behavior |
 | [Crash recovery](docs/crash-recovery.md) | Takeover and reconciliation after a Worker dies |
 | [Patch protocol](docs/patch-protocol.md) | Intent, file hashes, guarded apply and cached verdicts |
+| [Day 21 evaluation](docs/evaluation.md) | Four scenarios, recorded observations, scoring and timing limits |
 | [Design decisions](docs/design-decisions.md) | Trade-offs and explicit limits |
 | [Testing](docs/testing.md) | Implementation test scenarios and acceptance rules |
 | [Validation summary](docs/validation.md) | Recorded results and what readers can verify here |
@@ -84,7 +85,8 @@ public edition.
    is unchanged and the terminal Run cannot be claimed again.
 
 The Mock path requires no live model API key. Its reported outcome is a passing
-repair scenario; the source and raw execution output are not distributed here.
+repair scenario. Runnable source and selected Day 21 observations are available
+in the source repository; raw execution logs are not distributed here.
 
 ## Crash recovery walkthrough
 
@@ -112,6 +114,24 @@ the experiment bounded; they do not simulate takeover by directly changing Epoch
 
 These are bounded integration scenarios, not a long-running production load test.
 
+## Day 21 evaluation
+
+A recorded deterministic Mock dataset covers four controlled scenarios with
+three trials each: repair, already-passing baseline, two-round budget exhaustion
+and verified-result takeover. Scenario checks passed 12/12; fresh repair passed
+3/3 and verified-result recovery passed 3/3. Unsupported success claims were 0/9.
+
+Recorded P50/P95 were 400/1403 ms over 12 samples. Token usage was unknown in all
+12 trials; zero token accumulators are not measured zero cost. These are small
+fixture-specific observations, not live-model success or production performance.
+
+The Day 21 takeover seeds a verified result and performs a real new claim.
+It does not kill a Worker; the separate Day 20 test performs real SIGKILL before
+the final Agent checkpoint.
+
+See [methodology and source data](docs/evaluation.md), including public cases,
+JSONL, summary, scorer and reproduction instructions.
+
 ## Validation at a glance
 
 The implementation was validated on Linux/WSL with Go 1.27.1 and
@@ -119,9 +139,9 @@ PostgreSQL 16, without a live model API key:
 
 | Recorded suite | Passed test entries | FAIL | SKIP |
 | --- | ---: | ---: | ---: |
-| Full project | 207 | 0 | 0 |
-| Full project with race detector | 207 | 0 | 0 |
-| Database-independent suites | 127 | 0 | 0 |
+| Full project | 226 | 0 | 0 |
+| Full project with race detector | 226 | 0 | 0 |
+| Database-independent suites | 133 | 0 | 0 |
 
 Counts include parent tests, subtests and child-helper entries.
 Current software CI is available in the [source repository Actions](https://github.com/Loz888/durable-coding-agent-runtime-source/actions).

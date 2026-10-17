@@ -2,7 +2,7 @@
 
 [English](architecture.md) | [简体中文](zh-CN/architecture.md) | [Home](../README.md)
 
-This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+This page describes the implementation. Run reproduction commands in the [public source repository](https://github.com/Loz888/durable-coding-agent-runtime-source); this documentation repository contains no source and does not execute software CI.
 
 ## Responsibilities and dependencies
 runtimecore runs task.Task through executor.Registry with concurrent Workers
@@ -20,7 +20,7 @@ internal/integration20 is test-only and references those packages one-way.
 No production module imports it or needs a private-test export bridge.
 
 ## Schemas
-The implementation applies schema migrations in order: 001 creates day12.agent_runs/checkpoints; 002 adds
+Apply migrations in order: 001 creates day12.agent_runs/checkpoints; 002 adds
 Lease owner/Epoch/expiry; 003 adds queue/priority/availability/retry_count;
 004 adds budgets/failures/times/run_events; 005 creates day19 repair_runs and
 patch_ops; 006 adds Worktree Identity and causal round_number.
@@ -45,3 +45,11 @@ contend on the same Run row. Guarded Rename is followed by authority/hash
 validation before result commit. Model calls and Go tests run outside those
 row-lock transactions. This is a trusted single-writer/shared-local-filesystem
 model, not a sandbox or filesystem/database distributed transaction.
+
+## Evaluation boundary
+
+eval21.Score aggregates validated Observation records; cmd/day21-eval parses
+manifests/JSONL and writes reports. Neither adds another Scheduler or Repair Loop.
+TestDay21Capture drives the existing Scheduler with deterministic proposals and
+collects independent baseline, Worktree-test, source-cleanliness and checkpoint evidence.
+See [evaluation](evaluation.md).

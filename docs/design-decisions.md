@@ -2,7 +2,7 @@
 
 [English](design-decisions.md) | [简体中文](zh-CN/design-decisions.md) | [Home](../README.md)
 
-This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+This page describes the implementation. Run reproduction commands in the [public source repository](https://github.com/Loz888/durable-coding-agent-runtime-source); this documentation repository contains no source and does not execute software CI.
 
 | Choice | Reason | Cost / boundary |
 |---|---|---|
@@ -15,12 +15,13 @@ This document describes the implementation published in the [source repository](
 | Short guarded transactions | Serialize Patch write with claims and renewal | A long file operation can delay Renew and expire |
 | Model/tests outside row locks | Avoid holding locks over network/build latency | Revalidate authority, binding and hash afterward |
 | Separate budgets | Crashes, retries and new proposals consume different resources | More counters, but takeover cannot reset them |
-| Retained package names | Preserve tested component boundaries | Less conventional naming, without risky mass refactor |
+| Retained package names | Preserve tested boundaries and inspectable evolution | Less conventional naming, without risky mass refactor |
 
 Diagnosis persists model/tool intent in history before execution, then outputs
 in a later checkpoint. A pending call can replay after crash: durable ordering
 does not guarantee arbitrary external-side-effect exactly-once. Controlled
 Patch effects permit more specific recovery via Before/After SHA.
 
-This edition publishes documentation only. Runnable implementation is linked
-above. No software license has been selected.
+No open-source license was selected automatically. Before publication, the
+owner must decide licensing, exposure of history/contact information and the
+documented trusted-code boundary.

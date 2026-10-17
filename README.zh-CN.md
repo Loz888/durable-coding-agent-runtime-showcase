@@ -62,6 +62,7 @@ flowchart TD
 | [执行生命周期](docs/zh-CN/execution-lifecycle.md) | 领取、心跳、检查点与重试流程 |
 | [崩溃恢复](docs/zh-CN/crash-recovery.md) | Worker 退出后的接管与状态核对 |
 | [补丁协议](docs/zh-CN/patch-protocol.md) | 补丁意图、文件哈希、受保护写入与缓存判定 |
+| [Day21 评测](docs/zh-CN/evaluation.md) | 四类场景、原始观测、评分口径与计时限制 |
 | [设计取舍](docs/zh-CN/design-decisions.md) | 技术选择、代价与适用边界 |
 | [测试策略](docs/zh-CN/testing.md) | 实现中的测试场景与验收规则 |
 | [验证结果](docs/zh-CN/validation.md) | 已记录的结果及公开文档的验证范围 |
@@ -107,6 +108,23 @@ sequenceDiagram
 
 这些是有明确范围的集成测试场景，不能代替长期生产负载测试。
 
+## Day21 评测
+
+已记录的确定性 Mock 数据包含四类受控场景，每类三次：
+修复失败基线、基线已通过、两轮预算耗尽、接管已验证结果。
+场景检查 12/12 通过，其中新修复 3/3、已验证结果恢复 3/3；
+缺少证据的成功声明为 0/9。
+
+12 个样本的历史 P50/P95 为 400/1403 ms。所有试验的 Token 用量均未知；
+累计字段为零不代表测得零费用。这些结果只描述小规模受控夹具，
+不能推广为真实模型成功率或生产性能。
+
+Day21 接管场景预先保存已验证结果，再通过真实领取取得新执行权限，
+并没有终止 Worker。真实 SIGKILL 由独立的 Day20 最终检查点前崩溃实验覆盖。
+
+[评测方法与源码数据](docs/zh-CN/evaluation.md)提供公开的场景、
+JSONL、汇总、评分器及复现说明。
+
 ## 验证结果概览
 
 实现的已记录验证环境为 Linux/WSL、Go 1.27.1 和 PostgreSQL 16，
@@ -114,9 +132,9 @@ sequenceDiagram
 
 | 已记录的测试集 | 通过的测试条目 | FAIL | SKIP |
 | --- | ---: | ---: | ---: |
-| 全项目测试 | 207 | 0 | 0 |
-| 全项目竞态检测 | 207 | 0 | 0 |
-| 不依赖数据库的测试集 | 127 | 0 | 0 |
+| 全项目测试 | 226 | 0 | 0 |
+| 全项目竞态检测 | 226 | 0 | 0 |
+| 不依赖数据库的测试集 | 133 | 0 | 0 |
 
 条目数包含父测试、子测试和子进程辅助测试入口。
 当前软件 CI 状态见[源码仓库 Actions](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。

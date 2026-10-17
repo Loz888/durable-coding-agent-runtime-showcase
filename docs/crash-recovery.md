@@ -2,7 +2,7 @@
 
 [English](crash-recovery.md) | [简体中文](zh-CN/crash-recovery.md) | [Home](../README.md)
 
-This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+This page describes the implementation. Run reproduction commands in the [public source repository](https://github.com/Loz888/durable-coding-agent-runtime-source); this documentation repository contains no source and does not execute software CI.
 
 SIGKILL prevents cleanup, release and final checkpoint writes. PostgreSQL may
 still show running while the file already contains a Patch.
@@ -21,7 +21,7 @@ A verified_pass Patch may survive without the final Agent checkpoint.
 CodingHandler recovers it without a new model call and finishes through
 FencedStore. Patch completion and Run completion are separate boundaries.
 
-The implementation crash-recovery harness runs the four-state child SIGKILL matrix and a
+scripts/demo_crash_recovery.sh runs the four-state child SIGKILL matrix and a
 true SIGKILL between verified_pass and final checkpoint. It verifies real
 ClaimBatch takeover, fencing, cached verdicts, shared budget and source isolation.
 Only that test Run's expiry is advanced to avoid a long wait; Epoch is never
@@ -32,3 +32,17 @@ calls the same public CodingHandler. These are bounded integration demos, not
 a daemon load benchmark. Rename and Commit remain separate; unknown file bytes,
 missing/replaced Worktrees, hostile writers, power loss and multi-host recovery
 are not made safe by declaring the demo successful.
+
+## Distinct fault windows
+
+| Experiment | Failure / takeover boundary | What it proves |
+| --- | --- | --- |
+| Day 19 legacy CLI | -inject-sigkill after Rename and before Patch result persistence | Intent/hash reconciliation; its legacy lab uses direct ownership changes rather than real Queue takeover |
+| Day 19 Store unit test | TestDay19CrashBetweenRenameAndResult returns an injected hook error | The Rename/result gap is recoverable; this unit test is explicitly not a real SIGKILL |
+| Four-state matrix | Owned child is killed after prepared, applied, verified_pass or verified_fail is durable | Recovery per committed state with actual ClaimBatch takeover |
+| Day 20 checkpoint gap | TestDay20RealSIGKILLBeforeCheckpoint kills its own child after verified_pass, before final Agent checkpoint | Patch verdict survives and a real new owner finishes the checkpoint without another model call |
+| Day 21 evaluation | Seed verified_pass, expire only the test lease, claim as Worker B | Deterministic cached-result takeover measurements; no SIGKILL is injected here |
+
+The Rename/result gap and verified-result/final-checkpoint gap are different.
+The current demo runs the real four-state matrix and Day 20 checkpoint test;
+retained Day 19 CLI/unit results are not substituted for those real-claim tests.

@@ -2,7 +2,9 @@
 
 [English](../patch-protocol.md) | [简体中文](patch-protocol.md) | [中文首页](../../README.zh-CN.md)
 
-本文介绍已公开实现中的补丁意图、写入与验证流程。
+本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
+
+本文介绍本仓库实现中的补丁意图、写入与验证流程。
 
 ```text
 prepared → applied → verified_pass / verified_fail
