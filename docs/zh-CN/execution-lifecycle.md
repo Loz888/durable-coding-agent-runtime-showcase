@@ -2,7 +2,7 @@
 
 [English](../execution-lifecycle.md) | [简体中文](execution-lifecycle.md) | [中文首页](../../README.zh-CN.md)
 
-本文介绍私有实现中的领取、执行、检查点与重试流程。
+本文介绍已公开实现中的领取、执行、检查点与重试流程。
 
 1. Submit 原子创建 Run 元数据和版本为零的历史记录。
 2. ClaimBatch 使用 FOR UPDATE SKIP LOCKED 按优先级与可用时间选择候选任务，

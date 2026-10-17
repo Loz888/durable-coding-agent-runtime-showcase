@@ -2,7 +2,7 @@
 
 [English](../patch-protocol.md) | [简体中文](patch-protocol.md) | [中文首页](../../README.zh-CN.md)
 
-本文介绍私有实现中的补丁意图、写入与验证流程。
+本文介绍已公开实现中的补丁意图、写入与验证流程。
 
 ```text
 prepared → applied → verified_pass / verified_fail

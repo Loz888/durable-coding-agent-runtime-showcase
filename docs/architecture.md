@@ -2,7 +2,7 @@
 
 [English](architecture.md) | [简体中文](zh-CN/architecture.md) | [Home](../README.md)
 
-This document describes the privately maintained implementation.
+This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
 
 ## Responsibilities and dependencies
 runtimecore runs task.Task through executor.Registry with concurrent Workers
@@ -20,7 +20,7 @@ internal/integration20 is test-only and references those packages one-way.
 No production module imports it or needs a private-test export bridge.
 
 ## Schemas
-The private implementation applies schema migrations in order: 001 creates day12.agent_runs/checkpoints; 002 adds
+The implementation applies schema migrations in order: 001 creates day12.agent_runs/checkpoints; 002 adds
 Lease owner/Epoch/expiry; 003 adds queue/priority/availability/retry_count;
 004 adds budgets/failures/times/run_events; 005 creates day19 repair_runs and
 patch_ops; 006 adds Worktree Identity and causal round_number.

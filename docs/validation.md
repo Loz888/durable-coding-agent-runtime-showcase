@@ -2,7 +2,7 @@
 
 [English](validation.md) | [简体中文](zh-CN/validation.md) | [Home](../README.md)
 
-The privately maintained implementation was validated on Linux/WSL with Go 1.27.1 and PostgreSQL16, without a model API key.
+The implementation was validated on Linux/WSL with Go 1.27.1 and PostgreSQL16, without a model API key.
 These are functional test observations, not throughput/latency benchmarks.
 
 | Command group | Passed test entries | FAIL | SKIP |
@@ -46,19 +46,15 @@ coverage test packages passed; these values describe this run only.
 
 ## Evidence and public verification boundary
 
-These figures summarize recorded runs of the private implementation.
-The public repository contains documentation only; it does not distribute
-source code, tests, migrations, raw logs, private workflow links or credentials.
+These figures summarize previously recorded implementation runs.
+The implementation source, tests and reproduction scripts are now published in the
+[source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+Its [Actions runs](https://github.com/Loz888/durable-coding-agent-runtime-source/actions) provide current software CI status.
 
-The private implementation CI passed again after commit-identity cleanup.
-No software CI badge or public execution result is asserted for this
-documentation repository. Readers cannot reproduce the software tests or
-coverage measurements from these documents alone.
+This documentation repository retains the historical validation summary and
+contains no runnable software suite. Counts include parent tests, subtests and
+child helpers; coverage describes one recorded run rather than throughput.
 
-The validation counts include parent tests, subtests and crash-child helpers;
-they are not a count of independent production workloads. Coverage values
-describe one recorded run and are not a throughput or reliability benchmark.
-
-The documented crash experiments used actual Queue claims, concurrent fencing,
-four persisted Patch states and owned-child SIGKILL. They do not prove power-loss
-safety, arbitrary external-effect exactly-once or multi-host recovery.
+The crash experiments exercised actual Queue claims, concurrent fencing,
+four Patch states and owned-child SIGKILL. They do not prove power-loss safety,
+arbitrary external-effect exactly-once or multi-host recovery.

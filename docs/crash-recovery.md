@@ -2,7 +2,7 @@
 
 [English](crash-recovery.md) | [简体中文](zh-CN/crash-recovery.md) | [Home](../README.md)
 
-This document describes the privately maintained implementation.
+This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
 
 SIGKILL prevents cleanup, release and final checkpoint writes. PostgreSQL may
 still show running while the file already contains a Patch.
@@ -21,7 +21,7 @@ A verified_pass Patch may survive without the final Agent checkpoint.
 CodingHandler recovers it without a new model call and finishes through
 FencedStore. Patch completion and Run completion are separate boundaries.
 
-The private crash-recovery harness runs the four-state child SIGKILL matrix and a
+The implementation crash-recovery harness runs the four-state child SIGKILL matrix and a
 true SIGKILL between verified_pass and final checkpoint. It verifies real
 ClaimBatch takeover, fencing, cached verdicts, shared budget and source isolation.
 Only that test Run's expiry is advanced to avoid a long wait; Epoch is never

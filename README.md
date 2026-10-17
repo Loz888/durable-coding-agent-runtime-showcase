@@ -5,13 +5,12 @@
 A Go engineering project exploring durable agent execution, PostgreSQL-backed
 scheduling, lease fencing and crash recovery for controlled code repair.
 
-**This public repository contains design documentation and validation summaries.**
-The implementation, tests, database migrations and executable demos are maintained
-privately. This repository can be read on GitHub; it does not provide a runnable
-application or source-code download.
+**This repository contains design documentation and validation summaries.**
+Implementation source, tests, database migrations and executable demos are
+available in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+This repository remains a documentation-focused edition.
 
-简要说明：这是项目的公开文档展示版，介绍架构、故障恢复协议、测试结果与能力边界。
-实现源码和运行材料保留在私有仓库中；本仓库不需要配置数据库或模型密钥。
+简要说明：这是项目的双语文档展示版；可运行源码与中英文使用说明见上方源码仓库链接。
 
 ## Engineering problem
 
@@ -25,7 +24,7 @@ Patch completion and Agent Run completion are separate durable boundaries.
 
 ## Implemented capabilities
 
-The following capabilities describe the privately maintained implementation:
+The following capabilities describe the published implementation:
 
 - PostgreSQL Queue with atomic priority/availability claims.
 - Lease heartbeat, Worker Epoch Fencing and checkpoint Revision CAS.
@@ -67,13 +66,13 @@ flowchart TD
 | [Crash recovery](docs/crash-recovery.md) | Takeover and reconciliation after a Worker dies |
 | [Patch protocol](docs/patch-protocol.md) | Intent, file hashes, guarded apply and cached verdicts |
 | [Design decisions](docs/design-decisions.md) | Trade-offs and explicit limits |
-| [Testing](docs/testing.md) | Private implementation test scenarios and acceptance rules |
+| [Testing](docs/testing.md) | Implementation test scenarios and acceptance rules |
 | [Validation summary](docs/validation.md) | Recorded results and what readers can verify here |
 
 ## Demonstration walkthrough
 
 This textual walkthrough describes a controlled experiment that was run against
-the private implementation. It replaces executable setup instructions in the
+the implementation. It replaces executable setup instructions in the
 public edition.
 
 1. Create a temporary Git repository containing a failing single-file Divide test.
@@ -106,7 +105,7 @@ sequenceDiagram
     B->>DB: Fenced checkpoint CAS, succeeded
 ```
 
-The private test harness also kills owned child processes after prepared,
+The implementation test harness also kills owned child processes after prepared,
 applied, verified_pass and verified_fail states. Takeover obtains its Epoch
 through a real Queue claim. Tests advance only their own Run's expiry to keep
 the experiment bounded; they do not simulate takeover by directly changing Epoch.
@@ -115,7 +114,7 @@ These are bounded integration scenarios, not a long-running production load test
 
 ## Validation at a glance
 
-The private implementation was validated on Linux/WSL with Go 1.27.1 and
+The implementation was validated on Linux/WSL with Go 1.27.1 and
 PostgreSQL 16, without a live model API key:
 
 | Recorded suite | Passed test entries | FAIL | SKIP |
@@ -125,7 +124,7 @@ PostgreSQL 16, without a live model API key:
 | Database-independent suites | 127 | 0 | 0 |
 
 Counts include parent tests, subtests and child-helper entries.
-The private implementation CI passed again after commit-identity cleanup.
+Current software CI is available in the [source repository Actions](https://github.com/Loz888/durable-coding-agent-runtime-source/actions).
 These are recorded implementation results, not CI checks executed by this
 documentation repository. They cannot be independently reproduced from this
 repository alone. See [validation details](docs/validation.md).
@@ -146,5 +145,5 @@ repository alone. See [validation details](docs/validation.md).
 Multi-file Patch, sandbox isolation, broader repair evaluation, OpenTelemetry,
 measured throughput benchmarks and multi-host Worktree recovery remain future work.
 
-Source-code publication and software licensing are outside this public
-documentation edition.
+Runnable source and reproduction instructions are linked above.
+No software license has been selected.

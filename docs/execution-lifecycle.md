@@ -2,7 +2,7 @@
 
 [English](execution-lifecycle.md) | [简体中文](zh-CN/execution-lifecycle.md) | [Home](../README.md)
 
-This document describes the privately maintained implementation.
+This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
 
 1. Submit atomically creates Run metadata and revision-zero history.
 2. ClaimBatch selects priority/available candidates with FOR UPDATE SKIP LOCKED,

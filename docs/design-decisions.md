@@ -2,7 +2,7 @@
 
 [English](design-decisions.md) | [简体中文](zh-CN/design-decisions.md) | [Home](../README.md)
 
-This document describes the privately maintained implementation.
+This document describes the implementation published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
 
 | Choice | Reason | Cost / boundary |
 |---|---|---|
@@ -22,5 +22,5 @@ in a later checkpoint. A pending call can replay after crash: durable ordering
 does not guarantee arbitrary external-side-effect exactly-once. Controlled
 Patch effects permit more specific recovery via Before/After SHA.
 
-This public edition publishes documentation only. Implementation source,
-execution materials and a software license are not included.
+This edition publishes documentation only. Runnable implementation is linked
+above. No software license has been selected.

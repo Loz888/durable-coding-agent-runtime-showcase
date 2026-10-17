@@ -5,10 +5,9 @@
 一个使用 Go 构建的 Agent 工程项目，关注执行状态持久化、PostgreSQL 调度、
 租约校验，以及受控代码修复中的崩溃恢复。
 
-**本公开仓库提供设计文档与验证结果摘要。**
-实现源码、测试代码、数据库迁移和可执行 Demo 保留在私有仓库。
-你可以直接在 GitHub 阅读本项目；这个文档展示版不提供可运行的应用或源码下载，
-也不需要配置数据库或模型 API Key。
+**本仓库提供设计文档与验证结果摘要。**
+实现源码、测试、数据库迁移和可执行 Demo 已在[源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)公开。
+本仓库仍专注于文档阅读；运行说明见[源码仓库中文 README](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/main/README.zh-CN.md)。
 
 ## 项目解决什么问题
 
@@ -22,7 +21,7 @@ Worker 修改文件后，可能在记录完成状态之前崩溃。
 
 ## 已实现的能力
 
-下面介绍的是私有实现中已具备的能力：
+下面介绍的是实现中已具备的能力：
 
 - PostgreSQL 队列，支持按优先级和可用时间原子领取任务。
 - 租约心跳、Worker Epoch 隔离校验，以及检查点 Revision CAS（版本比较并交换）。
@@ -64,12 +63,12 @@ flowchart TD
 | [崩溃恢复](docs/zh-CN/crash-recovery.md) | Worker 退出后的接管与状态核对 |
 | [补丁协议](docs/zh-CN/patch-protocol.md) | 补丁意图、文件哈希、受保护写入与缓存判定 |
 | [设计取舍](docs/zh-CN/design-decisions.md) | 技术选择、代价与适用边界 |
-| [测试策略](docs/zh-CN/testing.md) | 私有实现的测试场景与验收规则 |
+| [测试策略](docs/zh-CN/testing.md) | 实现中的测试场景与验收规则 |
 | [验证结果](docs/zh-CN/validation.md) | 已记录的结果及公开文档的验证范围 |
 
 ## 修复演示流程
 
-以下文字描述了已在私有实现上执行的受控实验。
+以下文字描述了已在实现上执行的受控实验。
 公开展示版使用文字流程介绍实验，不提供可执行的环境搭建步骤。
 
 1. 创建临时 Git 仓库，放入单文件 Divide 函数的失败测试。
@@ -81,7 +80,7 @@ flowchart TD
    已完成的 Run 不会再次被领取。
 
 Mock 路径不需要真实模型 API Key。该实验记录的结果是修复场景通过；
-本仓库不分发实现源码和原始执行输出。
+可运行源码已单独公开；本文档仓库不分发原始执行输出。
 
 ## 崩溃恢复演示流程
 
@@ -102,7 +101,7 @@ sequenceDiagram
     B->>DB: 通过权限校验与检查点 CAS，记录 succeeded
 ```
 
-私有测试还分别在 prepared、applied、verified_pass 和 verified_fail 状态后，
+实现测试还分别在 prepared、applied、verified_pass 和 verified_fail 状态后，
 终止测试自己创建的子进程。接管时的 Epoch 来自真实队列领取。
 为了缩短等待，测试只推进自身 Run 的到期时间，不直接修改 Epoch 来模拟接管。
 
@@ -110,7 +109,7 @@ sequenceDiagram
 
 ## 验证结果概览
 
-私有实现的验证环境为 Linux/WSL、Go 1.27.1 和 PostgreSQL 16，
+实现的已记录验证环境为 Linux/WSL、Go 1.27.1 和 PostgreSQL 16，
 未使用真实模型 API Key：
 
 | 已记录的测试集 | 通过的测试条目 | FAIL | SKIP |
@@ -120,7 +119,7 @@ sequenceDiagram
 | 不依赖数据库的测试集 | 127 | 0 | 0 |
 
 条目数包含父测试、子测试和子进程辅助测试入口。
-提交身份清理后，私有实现的 CI 再次通过。
+当前软件 CI 状态见[源码仓库 Actions](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。
 以上是实现工程的历史验证记录，并非这个文档仓库执行的 CI 结果；
 仅凭本仓库无法独立复现这些软件测试。详见[验证结果说明](docs/zh-CN/validation.md)。
 
@@ -139,4 +138,4 @@ sequenceDiagram
 多文件补丁、沙箱隔离、更广泛的修复评估、OpenTelemetry、
 实测吞吐量基准和跨主机 Worktree 恢复，均属于后续工作。
 
-实现源码的发布与软件许可授权不包含在本次公开文档展示版中。
+实现源码见上方独立源码仓库；本项目尚未选择软件 License。

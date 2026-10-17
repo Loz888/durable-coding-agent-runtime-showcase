@@ -2,7 +2,7 @@
 
 [English](../crash-recovery.md) | [简体中文](crash-recovery.md) | [中文首页](../../README.zh-CN.md)
 
-本文介绍私有实现中的接管与恢复协议。
+本文介绍已公开实现中的接管与恢复协议。
 
 SIGKILL 会阻止清理、租约释放和最终检查点写入。
 此时 PostgreSQL 可能仍记录 running，而文件中已经包含补丁。
@@ -27,7 +27,7 @@ CodingHandler 可以恢复这份结果，不再次调用模型，再通过 Fence
 
 ## 已覆盖的故障场景
 
-私有崩溃恢复测试覆盖四种持久化状态后的子进程 SIGKILL，
+实现崩溃恢复测试覆盖四种持久化状态后的子进程 SIGKILL，
 以及 verified_pass 已保存、最终检查点尚未提交之间的真实 SIGKILL。
 
 断言覆盖真实 ClaimBatch 接管、Epoch 隔离校验、缓存判定复用、

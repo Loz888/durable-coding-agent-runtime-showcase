@@ -2,7 +2,7 @@
 
 [English](../design-decisions.md) | [简体中文](design-decisions.md) | [中文首页](../../README.zh-CN.md)
 
-本文介绍私有实现中的技术选择及其代价。
+本文介绍已公开实现中的技术选择及其代价。
 
 | 选择 | 原因 | 代价与边界 |
 | --- | --- | --- |
@@ -24,4 +24,4 @@
 持久化执行顺序不等于对任意外部副作用都保证“恰好一次”。
 受控的补丁修改可以根据 Before/After SHA 采用更具体的恢复策略。
 
-本公开展示版仅发布文档，不包含实现源码、运行材料或软件许可授权。
+本展示版仅发布文档；可运行实现见[源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)。本项目尚未选择软件 License。

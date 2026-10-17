@@ -2,7 +2,7 @@
 
 [English](testing.md) | [简体中文](zh-CN/testing.md) | [Home](../README.md)
 
-This document describes tests in the private implementation.
+This document describes tests published in the [source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
 The public documentation repository contains no test suite, runnable demo,
 application source or database migrations. The following sections explain
 the engineering acceptance criteria rather than provide shell instructions.
@@ -59,7 +59,7 @@ a misleading successful result.
 
 ## Compiler-cache handling
 
-The private race CI compiled normal test dependencies before the full race
+The implementation race CI compiled normal test dependencies before the full race
 suite. Nested ordinary Go test processes use a different standard-library
 cache from race-instrumented processes. Cache preparation kept cold compiler
 work from consuming strict fixture execution deadlines.
@@ -69,7 +69,8 @@ Lease guards and all assertions remained unchanged.
 
 ## Public verification boundary
 
-Readers can inspect the design documents and their consistency.
-The implementation source, private CI logs and executable fixtures are not
-available from this repository, so the reported test outcomes are author-reported
-engineering evidence rather than independently reproducible public results.
+This repository supplies the design narrative and recorded validation summary.
+Implementation source and executable fixtures are published separately in the
+[source repository](https://github.com/Loz888/durable-coding-agent-runtime-source).
+Use its setup instructions to reproduce software tests and its Actions page to
+check current CI; this documentation repository does not execute the software suite.
