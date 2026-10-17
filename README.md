@@ -1,5 +1,7 @@
 # Durable Coding Agent Runtime
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 A Go engineering project exploring durable agent execution, PostgreSQL-backed
 scheduling, lease fencing and crash recovery for controlled code repair.
 

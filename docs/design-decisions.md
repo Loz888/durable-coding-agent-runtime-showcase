@@ -1,5 +1,7 @@
 # Design decisions and trade-offs
 
+[English](design-decisions.md) | [简体中文](zh-CN/design-decisions.md) | [Home](../README.md)
+
 This document describes the privately maintained implementation.
 
 | Choice | Reason | Cost / boundary |

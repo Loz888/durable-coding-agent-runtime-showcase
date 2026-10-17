@@ -1,5 +1,7 @@
 # Recorded implementation validation
 
+[English](validation.md) | [简体中文](zh-CN/validation.md) | [Home](../README.md)
+
 The privately maintained implementation was validated on Linux/WSL with Go 1.27.1 and PostgreSQL16, without a model API key.
 These are functional test observations, not throughput/latency benchmarks.
 

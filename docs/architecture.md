@@ -1,5 +1,7 @@
 # Architecture
 
+[English](architecture.md) | [简体中文](zh-CN/architecture.md) | [Home](../README.md)
+
 This document describes the privately maintained implementation.
 
 ## Responsibilities and dependencies

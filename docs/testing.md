@@ -1,5 +1,7 @@
 # Testing strategy
 
+[English](testing.md) | [简体中文](zh-CN/testing.md) | [Home](../README.md)
+
 This document describes tests in the private implementation.
 The public documentation repository contains no test suite, runnable demo,
 application source or database migrations. The following sections explain

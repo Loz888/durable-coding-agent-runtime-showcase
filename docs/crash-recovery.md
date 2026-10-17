@@ -1,5 +1,7 @@
 # Crash recovery
 
+[English](crash-recovery.md) | [简体中文](zh-CN/crash-recovery.md) | [Home](../README.md)
+
 This document describes the privately maintained implementation.
 
 SIGKILL prevents cleanup, release and final checkpoint writes. PostgreSQL may
