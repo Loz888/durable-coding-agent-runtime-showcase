@@ -2,6 +2,10 @@
 
 [English](../design-decisions.md) | [简体中文](design-decisions.md) | [中文首页](../../README.zh-CN.md)
 
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
+
 本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
 
 本文介绍本仓库实现中的技术选择及其代价。

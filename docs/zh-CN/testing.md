@@ -1,8 +1,12 @@
 # 测试策略
 
+> 本文描述配套源码实现；命令在源码目录运行。展示仓库只有文档，不运行软件 CI。本次为本地对齐稿，尚未推送。
+
 [English](../testing.md) | [简体中文](testing.md) | [中文首页](../../README.zh-CN.md)
 
-本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
 
 本文介绍本仓库实现中的测试与验收标准。
 可执行配置与测试命令见[中文 README](../../README.zh-CN.md)和[英文测试说明](../testing.md)。
@@ -65,7 +69,7 @@ race CI 在完整竞态测试之前，先编译普通测试依赖。
 
 ## 复现与结果
 
-本仓库提供实现源码、测试、数据库迁移与演示脚本。
+配套源码仓库提供实现源码、测试、数据库迁移与演示脚本。
 按照中文 README 配置专用数据库后，可以执行普通测试、竞态检测和 Demo。
 实时结果见 [Actions](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。
 原始本地执行日志不提交到 Git。
@@ -78,6 +82,18 @@ day21_accept.sh 检查全部 12 个 Capture 子场景，
 避免将重复观测追加到另一轮采集文件。
 采集脚本仅为那一次 Capture 命令设置此变量。
 
-普通、竞态与覆盖率验收使用 360 秒超时；
-核心模块十轮回归使用 900 秒。调整超时不删除任何测试或断言。
+普通与竞态验收使用 360 秒超时；本轮五包十轮回归使用 1,800 秒及 -p 1，
+较早三包十轮记录使用 900 秒。调整超时不删除任何测试或断言，本轮不声明新覆盖率。
 运行方法及数据解释见[评测文档](evaluation.md)。
+
+## 试点集成测试角色
+
+新增 pilot API 夹具创建独立受限登录角色，并使用仅测试有效的随机密码，兼容 TCP/SCRAM。夹具管理连接需要创建/管理测试角色及在专用测试库授权的权限，建议使用独立测试集群或仓库 CI；不能通过提升正式 API 角色权限来运行测试。API 本身拒绝超级用户和所有者凭据。
+
+## 本地工程验收 · 2026-10-21（未发布）
+
+配套源码在标准库独立 Go 模块范围内实现受控候选全树快照、版本化 `verification_input_digest` 与末次 Claim 后的受限收尾。历史判定缺少摘要时不能直接复用。收尾复核身份、完整输入、状态与 Checkpoint CAS，不增加执行 Claim/Epoch、修复轮数或模型次数；取消/Sweep 竞争和回滚有专项回归。
+
+最新 Worker 启动修正后的最终源码完整回归/race 各为 **301 PASS、0 FAIL、0 SKIP**（含父/子测试事件）。核心五包十轮回归 **1,360 PASS、0 FAIL、0 SKIP**（`-p 1 -count=10 -timeout 1800s`；repair20、durable、repair19、internal/integration20、reliability15）。准确命令与最终源码指纹保存在配套源码本地 `docs/review-20261020/RESULTS.md` 和 `reports/review-20261020/engineering-20261021.json`。先停旧 Worker，应用迁移 **001–011**，再启动新 Worker；不承诺混用旧、新 Worker 的滚动升级。
+
+本段是源码的本地验收，不是展示仓库软件 CI 或远端 CI。容器适配器已有代码，实际引擎隔离仍未验收；历史真实单样本、Day21 Mock 与旧统计保持各自日期、版本和分母。配套新增文件尚未推送，故不链接尚不存在的 GitHub 路径。

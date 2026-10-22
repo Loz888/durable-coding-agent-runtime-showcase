@@ -1,8 +1,16 @@
 # Day21 评测方法
 
+> 本文描述配套源码实现；命令在源码目录运行。展示仓库只有文档，不运行软件 CI。本次为本地对齐稿，尚未推送。
+
 [English](../evaluation.md) | [简体中文](evaluation.md) | [中文首页](../../README.zh-CN.md)
 
-本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
+
+## 评审后证据分层
+
+[当前结果汇总](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/main/docs/review-20261020/RESULTS.md)分别列出工程回归、本页历史 Mock 与真实单文件修复。新增 diagnosis-v1 闸门验证测试观察和引用一致性，不验证自由文本根因；260 个测试事件或 evidence_consistent 不是真实模型正确率分母。下方 Day21 原始数据不改。
 
 ## 评测对象
 
@@ -109,3 +117,17 @@ cmp evaldata/day21/report.md "$output/report.md"
 
 不能据此得出真实模型修复率、API 支出、吞吐量、沙箱安全、
 跨主机重建或任意外部副作用恰好一次的结论。
+
+## 本地工程验收 · 2026-10-21（未发布）
+
+配套源码在标准库独立 Go 模块范围内实现受控候选全树快照、版本化 `verification_input_digest` 与末次 Claim 后的受限收尾。历史判定缺少摘要时不能直接复用。收尾复核身份、完整输入、状态与 Checkpoint CAS，不增加执行 Claim/Epoch、修复轮数或模型次数；取消/Sweep 竞争和回滚有专项回归。
+
+最新 Worker 启动修正后的最终源码完整回归/race 各为 **301 PASS、0 FAIL、0 SKIP**（含父/子测试事件）。核心五包十轮回归 **1,360 PASS、0 FAIL、0 SKIP**（`-p 1 -count=10 -timeout 1800s`；repair20、durable、repair19、internal/integration20、reliability15）。准确命令与最终源码指纹保存在配套源码本地 `docs/review-20261020/RESULTS.md` 和 `reports/review-20261020/engineering-20261021.json`。先停旧 Worker，应用迁移 **001–011**，再启动新 Worker；不承诺混用旧、新 Worker 的滚动升级。
+
+本段是源码的本地验收，不是展示仓库软件 CI 或远端 CI。容器适配器已有代码，实际引擎隔离仍未验收；历史真实单样本、Day21 Mock 与旧统计保持各自日期、版本和分母。配套新增文件尚未推送，故不链接尚不存在的 GitHub 路径。
+
+## Local scripted extension / 本地冻结评测 · 2026-10-21（未发布）
+
+Companion source `evaldata/repair-extension-20261021/cases.json` is frozen at SHA256 `48c8a693c519aae44b63daf9c3ab26cbb422a2804d5c46f328ecab4e53a7c014`. It contains 14 correct scripted patches, 2 already-passing cases, 2 exhausted budgets, 1 invalid fragment and 1 intentional overfit. Real Queue/Claim/Patch/Checkpoint paths run, followed by an independently specified holdout test on a copy.
+
+最终结果20/20预期行为符合，17可见测试通过、16独立Oracle通过，1个可见通过/Oracle失败为预设负对照；原Repository均干净，真实Claim Epoch均为1。脚本提案不是模型输出，这不是20/20修复准确率，也不是新增Live成绩；不覆盖上面的历史Day21与真实单样本。当前仍受控单文件、可信宿主测试；更广泛真实仓库/模型评测未完成。

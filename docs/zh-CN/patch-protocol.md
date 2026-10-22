@@ -2,6 +2,10 @@
 
 [English](../patch-protocol.md) | [简体中文](patch-protocol.md) | [中文首页](../../README.zh-CN.md)
 
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
+
 本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
 
 本文介绍本仓库实现中的补丁意图、写入与验证流程。
@@ -39,7 +43,10 @@ prepared 意图仍保留，供下一位合法持有者恢复。
 VerifyGo 在长事务之外运行。
 持久化测试判定前，再次验证租约、Worktree 绑定和当前文件哈希。
 
-已验证的结果会返回缓存的输出与退出码，无需再次运行测试。
+2026-10-21 未发布的本地实现还要求版本化 verification_input_digest 匹配受控候选全树、
+测试输入与执行配置，才可复用缓存输出和退出码。摘要缺失或变化不能继承旧的通过判定；
+重新验证需要有效执行授权。当前只支持标准库独立 Go 模块。
+见[当前本地范围](validation.md#本地工程验收--2026-10-21未发布)。
 旧数据表未持久化 DurationMS，因此缓存结果中的耗时不能当作新一轮测试的测量值。
 
 ## 身份边界

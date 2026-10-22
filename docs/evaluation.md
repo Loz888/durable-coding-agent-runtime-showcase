@@ -1,8 +1,16 @@
 # Day 21 evaluation
 
+> This describes the companion source implementation. Run commands in the source checkout; this showcase contains documentation and runs no software CI. This alignment draft is local and has not been pushed.
+
 [English](evaluation.md) | [简体中文](zh-CN/evaluation.md) | [Home](../README.md)
 
-This page describes the implementation. Run reproduction commands in the [public source repository](https://github.com/Loz888/durable-coding-agent-runtime-source); this documentation repository contains no source and does not execute software CI.
+<!-- source-publication-version -->
+> Companion source is published at [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52). [Evidence and limits](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions). “Uncommitted/not pushed” wording below records acceptance-time snapshots rather than current publication status.
+
+
+## Evidence layers after the review
+
+The [current results page](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/main/docs/review-20261020/RESULTS.md) separates review regression, this historical Mock capture and the archived live single-file repair. The structured diagnosis-v1 gate checks observed execution and references, not root-cause correctness. Neither a 260-event regression count nor a passing diagnostic verdict is a live-model accuracy denominator. The recorded Day21 data below are unchanged.
 
 ## What was measured
 
@@ -112,3 +120,17 @@ Go 1.27.1 and PostgreSQL 16, but that does not make 400/1403 ms a general claim.
 
 No live-model success rate, API spending, throughput, sandbox security,
 multi-host reconstruction or arbitrary-effect exactly-once conclusion follows.
+
+## Local engineering acceptance · 2026-10-21 (unpublished)
+
+The companion source implements bounded complete candidate snapshots, a versioned `verification_input_digest` and evidence-only completion after the last execution Claim, limited to standalone stdlib-only Go modules. Historical verdicts without a digest cannot be reused directly. Completion checks identity, complete inputs, state and Checkpoint CAS without another execution Claim/Epoch, repair round or model call; cancellation/Sweep competition and rollback have dedicated regression cases.
+
+The final source full and race suites each passed **301 test/subtest events, zero failures/skips** after the Worker startup adjustment. The core five-package ten-repeat check passed **1,360 events, zero failures/skips** (`-p 1 -count=10 -timeout 1800s`; repair20, durable, repair19, internal/integration20 and reliability15). Exact commands and final source fingerprints are retained in the companion local `docs/review-20261020/RESULTS.md` and `reports/review-20261020/engineering-20261021.json`. Stop old Workers, apply migrations **001–011**, then start the new Worker; mixed-version rolling upgrades are not claimed.
+
+These are local source results, not software CI in this showcase or remote CI. Container adapter code exists, but actual engine isolation remains unverified. Historical live, Day21 Mock and older regression records retain their own dates, versions and denominators. New companion files remain unpublished, so this page does not link to nonexistent GitHub paths.
+
+## Local scripted extension / 本地冻结评测 · 2026-10-21（未发布）
+
+Companion source `evaldata/repair-extension-20261021/cases.json` is frozen at SHA256 `48c8a693c519aae44b63daf9c3ab26cbb422a2804d5c46f328ecab4e53a7c014`. It contains 14 correct scripted patches, 2 already-passing cases, 2 exhausted budgets, 1 invalid fragment and 1 intentional overfit. Real Queue/Claim/Patch/Checkpoint paths run, followed by an independently specified holdout test on a copy.
+
+All 20 expected behaviors match: 17 visible-test positives, 16 oracle positives and one intentional visible-positive/oracle-negative control. All original repositories stay clean, with real claim Epoch 1. Scripted proposals are not model outputs: this is neither a 20/20 repair accuracy claim nor a new live-model result. Historical Day21 and live evidence remain separate. Scope remains controlled single-file, trusted host execution; broader real-repository/model evaluation is incomplete.

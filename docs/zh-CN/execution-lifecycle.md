@@ -2,6 +2,10 @@
 
 [English](../execution-lifecycle.md) | [简体中文](execution-lifecycle.md) | [中文首页](../../README.zh-CN.md)
 
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
+
 本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
 
 本文介绍本仓库实现中的领取、执行、检查点与重试流程。
@@ -20,10 +24,11 @@
 6. Scheduler 释放已完成的任务。终态 Run 不可再次领取。
 7. RetryLater 或 Day15 的暂时性失败策略负责释放并重新调度；永久失败终止执行。
    旧持有者或 CAS 冲突不能结束新持有者的任务。
-8. 同一个 Scheduler 定期执行有批量与时间限制的 SweepExhausted。
-   已释放、租约为空或已过期且预算耗尽的 Run 会进入失败终态，
-   包括被 SIGKILL 后来不及调用 RetryLater 的情况。
-   有效租约和成功终态仍受保护；失败转换与事件写入保持事务性和幂等性。
+8. 同一个 Scheduler 定期执行有批量与时间限制的维护。2026-10-21 未发布的本地实现
+   先考虑 completion_pending Run 的受限收尾：在受保护 Run 行事务内复核 verified_pass、
+   身份、完整验证输入和 CAS，不增加执行授权。普通 SweepExhausted 处理其余耗尽路径，
+   排除待收尾记录；有效租约、取消与终态仍受保护。
+   详见[当前本地验收范围](validation.md#本地工程验收--2026-10-21未发布)。
 
 ## 三类计数器
 

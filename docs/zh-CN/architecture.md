@@ -1,10 +1,97 @@
 # 系统架构
 
+
+<!-- source-publication-version -->
+> 配套源码已同步至 [df93c3c](https://github.com/Loz888/durable-coding-agent-runtime-source/commit/df93c3c13b130b3d08a635a325cb592f4908fd52)；[实际验收与边界](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/df93c3c13b130b3d08a635a325cb592f4908fd52/reports/runtime-followup-20261022/README.md) · [GitHub CI](https://github.com/Loz888/durable-coding-agent-runtime-source/actions)。下方“未提交／未推送”仅保留验收时快照，不表示当前发布状态。
+
+
+<!-- runtime-followup:start -->
+## 2026-10-22 续批更新
+
+共享 `internal/goinput` 元数据规划器连接 `repair17` 与 `executor`，Worker沙箱v4包含输入策略；4个真实vendor/workspace场景通过。制品盘点只读，未实现删除协议。 详见配套源码本地 `reports/runtime-followup-20261022`；尚未推送，展示仓库无软件 CI。
+<!-- runtime-followup:end -->
+
+## 2026-10-22 本地升级：实现与验收范围
+
+本节是当前本地工作树；此前各日期的表格、BLOCKED 和“尚未实现”是历史快照。未提交或推送，本页不继承旧远端 CI。
+
+| 方向 | 本轮交付 | 证据与边界 |
+|---|---|---|
+| 多文件补丁 | 同一逻辑轮次最多 8 个白名单 Go 文件，逐文件 before/after 摘要、全清单预检、统一验证 | 真实 Claim + 5 个 SIGKILL 窗口，含第一个 Rename 后的混合状态；多个 Rename 与 SQL 仍非原子操作 |
+| 真实沙箱 | 固定镜像摘要、非 root、只读根、无网络、资源上限、超时；独立按身份清理孤儿 | 已运行真实 Docker；不是恶意内核逃逸证明，docker 组具有管理员级权限 |
+| 模型恢复 | 请求意图、已观察响应与 Usage 持久化，恢复先复用响应；未知结果拒绝自动重发 | 3 个实际 SIGKILL 窗口；显式再授权最多 3 个逻辑尝试，物理费用预算另行约束，不保证 provider Exactly-once |
+| 真实评测 | 冻结 12 项人工合成任务，High、deepseek-flash、单轮 | 11 次真实调用，3382 输入 / 4201 输出 Token；9 个新修复、1 个恢复对照通过独立断言，1 个不可修复对照按预期失败、1 个基线通过且零调用 |
+| OTel | OTLP HTTP → Collector → Jaeger / Prometheus，耗时与错误指标、有界导出重试 | 实际读取 1 条新 Trace / 3 个 Span、指标和 firing 告警；受控错误，无外部联系人，SIGKILL 仍可能丢失缓冲数据 |
+| 基准 | 真实 PG 固定等待、持续到达，以及真实 Worktree + Go test 负载 | 使用单调计时，保留数据库墙钟原值与异常计数；具体轮次见机器结果，不代表 LLM 吞吐或生产容量 |
+| 可迁移 Worktree | 基线 commit + 有界全文件制品 + 持久化补丁链；新 Claim 下重建身份并重验 | 两个独立容器目录和第三个制品服务已验证；A SIGKILL、自然到期、B 真实 Epoch2 接管；只有一台物理电脑 |
+| 输入与生命周期 | 显式 sealed-vendor / sealed-workspace 离线输入策略；终态 Worktree dry-run/受保护退役；数据库与角色恢复实验 | sealed 输入已完成 4 个真实沙箱场景；Workspace 限根内模块，不支持任意依赖图；数据库恢复只使用新建合成库 |
+
+真实调用收到的型号字段为 `deepseek-flash`，这是服务端别名，不是不可变模型权重快照。2026-10-22 官方文档将它路由至 DeepSeek-V4.1-Flash-1017。峰时 cache-miss 上界估价 **$0.0060558**，不是供应商账单；本轮授权上限 $2，历史预算没有挪用。原始响应不公开推理内容或 Key。
+
+可迁移恢复只覆盖已有已提交制品和持久化补丁链；首次制品提交前丢盘、未观察模型输出及任意外部副作用不能自动恢复。
+
+仍未验证：第二台物理主机、网络分区/断电、任意不可信大型仓库、真实开源缺陷总体修复率、独立人工判定、长时生产压力/SLA，以及历史两条数据库负时长的根因。单调计时没有消除 Lease 对数据库墙钟的依赖。没有自动提交、推送或对外发布。
+
+```mermaid
+flowchart TD
+    Submit[Submit / admission] --> Queue[(PostgreSQL Queue + Checkpoint)]
+    Queue --> Worker[Existing Scheduler / Worker]
+    Worker --> Lease[Lease + Epoch + Revision CAS]
+    Worker --> Response[(Intent / observed model response)]
+    Response --> Budget[(Persistent physical-call budget)]
+    Response --> Patch[(One bounded multi-file Patch Intent)]
+    Patch --> Worktree[Managed identity / per-file guarded Rename]
+    Worktree --> Verify[Whole-input snapshot / tests]
+    Verify --> Patch
+    Verify --> Queue
+    Worktree --> Artifact[(Private content-addressed artifact)]
+    Artifact --> Rebuild[Fresh claim: local clone + intent replay + new identity + retest]
+    Rebuild --> Worktree
+    Verify --> Sandbox[Optional Docker + independent scoped reaper]
+    Worker --> OTLP[Optional OTLP Collector]
+    OTLP --> Backends[Jaeger / Prometheus / local controlled alert]
+    Rebuild -. unverified physical fault domain .-> Physical[Second physical machine / power loss]
+```
+
+---
+
+
+> 本文描述配套源码实现；命令在源码目录运行。展示仓库只有文档，不运行软件 CI。本次为本地对齐稿，尚未推送。
+
 [English](../architecture.md) | [简体中文](architecture.md) | [中文首页](../../README.zh-CN.md)
 
-本文档展示源码实现；下文复现命令需在[公开源码仓库](https://github.com/Loz888/durable-coding-agent-runtime-source)中运行。本展示仓库不包含源码或自行执行软件 CI。
-
 本文介绍本仓库实现中的组件与边界。
+
+## 实现链路与规划边界
+
+```mermaid
+flowchart TD
+  subgraph done[已实现：受控单文件与本地 Worktree]
+    A[Submit] --> Q[(PG Queue)] --> W[有界 Scheduler]
+    W --> L[Lease 心跳 / Epoch]
+    W --> D[Diagnosis Runner]
+    W --> C[CodingHandler]
+    D --> T[模型决策 / 工具]
+    T --> CP[受保护 Checkpoint CAS]
+    C --> P[(Patch Intent / Result)]
+    P --> WT[身份校验 Worktree]
+    WT --> I[受控候选快照 / 输入摘要]
+    I --> V[Go 测试]
+    P --> F[末次领取证据收尾]
+    F --> CP
+    V --> P
+    C --> CP
+    L --> CP
+    CP --> O[执行状态 / 证据判定]
+  end
+  subgraph pending[规划或未验收：不在本轮能力声明内]
+    X[容器隔离实测：缺引擎]
+    M[多文件 / 多主机：规划]
+  end
+  style pending stroke-dasharray: 5 5
+```
+
+下方虚线框没有已验收的数据流连接，不表示这些组件已投入运行。源码定位、验证和限制见[能力索引](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/main/docs/review-20261020/IMPLEMENTATION.md)。
 
 ## 组件职责与依赖关系
 
@@ -34,6 +121,13 @@ internal/integration20 仅用于测试，单向引用这些模块。
 | 004 | 增加预算、失败信息、时间字段与 run_events |
 | 005 | 创建 day19.repair_runs 与 patch_ops |
 | 006 | 增加 Worktree Identity 和表示因果顺序的 round_number |
+| 007 | 增加试点身份、登记仓库、幂等与 execution profile |
+| 008 | 增加跨 Worker 模型准入与持久费用预留 |
+| 009 | 增加 outcome_verdict 与 diagnostic_report，旧记录不追认为已验证 |
+| 010（本地未发布） | 为补丁判定增加 verification_input_digest；历史缺失摘要不可直接复用 |
+| 011（本地未发布） | 为 Run 增加 completion_pending；这是证据收尾信号，不增加执行权限 |
+
+升级时先停止旧 Worker，再应用至 011，最后启动新版本。
 
 HTTP 持久化通过 EnsureTaskSchema 管理独立的 tasks 结构；
 测试在随机的 runtime_test_* schema 中应用 schema.sql。
@@ -41,6 +135,10 @@ HTTP 持久化通过 EnsureTaskSchema 管理独立的 tasks 结构；
 生产事件以 (run_id, revision, event_type) 保证唯一。
 旧 Day15 测试夹具使用另一种结构，由 Store 识别。
 相同版本、相同类型的观测可能合并，因此不能将其理解为“每次尝试必有一条独立事件”。
+
+## 执行状态与诊断证据
+
+受保护的终态 Checkpoint 事务同时冻结 finished_at；统计分开完成、运行中与历史时间缺失。诊断 succeeded 仅表示流程完成，outcome_verdict 独立标识证据一致、缺证据或证据冲突；检查实际测试执行元数据、当前工具引用与持久化文本摘要，不证明自由文本根因。编码路径另记录 tests_passed/tests_failed。两种模型适配器共用 internal/providererr，详见[本轮实现](https://github.com/Loz888/durable-coding-agent-runtime-source/blob/main/docs/review-20261020/IMPLEMENTATION.md)。
 
 ## Worktree 生命周期
 
@@ -51,6 +149,9 @@ repair19.Register 将其绝对路径、源码提交和身份绑定到逻辑 Run�
 工作区丢失、路径成为符号链接、身份被替换或基线被 rebase 时，校验会拒绝继续执行。
 尚未完成的 Run 需要保留工作区以便恢复；
 集成测试夹具负责自己创建的临时源码与清理工作。
+
+当前本地 Worker 启动时将相对 Worktree base 规范为绝对路径。重启时应显式使用同一绝对
+-worktree-base / WORKTREE_BASE，并保留工具链和白名单配置；切换启动目录不会自动找到旧 Worktree。
 
 ## 持久化边界
 
@@ -70,3 +171,15 @@ cmd/day21-eval 读取场景清单与 JSONL，输出报告。
 TestDay21Capture 使用现有 Scheduler 和确定性提案，
 独立核查基线、Worktree 测试、原始仓库干净状态与检查点。
 详见[评测方法](evaluation.md)。
+
+## 本地工程验收 · 2026-10-21（未发布）
+
+配套源码在标准库独立 Go 模块范围内实现受控候选全树快照、版本化 `verification_input_digest` 与末次 Claim 后的受限收尾。历史判定缺少摘要时不能直接复用。收尾复核身份、完整输入、状态与 Checkpoint CAS，不增加执行 Claim/Epoch、修复轮数或模型次数；取消/Sweep 竞争和回滚有专项回归。
+
+最新 Worker 启动修正后的最终源码完整回归/race 各为 **301 PASS、0 FAIL、0 SKIP**（含父/子测试事件）。核心五包十轮回归 **1,360 PASS、0 FAIL、0 SKIP**（`-p 1 -count=10 -timeout 1800s`；repair20、durable、repair19、internal/integration20、reliability15）。准确命令与最终源码指纹保存在配套源码本地 `docs/review-20261020/RESULTS.md` 和 `reports/review-20261020/engineering-20261021.json`。先停旧 Worker，应用迁移 **001–011**，再启动新 Worker；不承诺混用旧、新 Worker 的滚动升级。
+
+本段是源码的本地验收，不是展示仓库软件 CI 或远端 CI。容器适配器已有代码，实际引擎隔离仍未验收；历史真实单样本、Day21 Mock 与旧统计保持各自日期、版本和分母。配套新增文件尚未推送，故不链接尚不存在的 GitHub 路径。
+
+## Optional tracing / 可选追踪 · 2026-10-21（本地未发布）
+
+Submit/API在同一Run事务保存W3C trace carrier，Worker提取并关联Patch与Checkpoint操作，真实OpenTelemetry SDK按进程导出到新建私有NDJSON文件。真实独立子进程回归核对TraceID和ParentSpanID，不代表跨主机Worktree恢复。记录元数据，不输出Prompt/源码/连接串/原始错误；默认关闭，启用前应用001–012。没有OTLP后端/Metrics告警；SIGKILL可丢尾部span，追踪不授予Lease/Epoch执行权。新源码完整/race均309 PASS，前面301属于此前收口快照。
